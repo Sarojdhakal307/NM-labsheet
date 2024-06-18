@@ -28,6 +28,9 @@ int main()
             else
                 printf("The process doesn\'t converge.");
         }
+
+     printf("\nBy Saroj Dhakal.");
+
     return 0;
 }
 

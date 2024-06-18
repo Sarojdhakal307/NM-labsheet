@@ -49,5 +49,7 @@ void main()
     }
     fp=sum;
     printf("\nAt xp=%f, fp = %f",xp,fp);
+     printf("\nBy Saroj Dhakal.");
+
     getch();
 }

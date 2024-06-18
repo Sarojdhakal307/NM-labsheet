@@ -45,6 +45,8 @@ int main()
     }
     fp=sum;
     printf("\nThe required functional value at %f = %f",xp,fp);
+     printf("\nBy Saroj Dhakal.");
+
     getch();     
     return 0;
 }

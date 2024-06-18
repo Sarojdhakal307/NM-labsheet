@@ -33,5 +33,7 @@ int main() {
         }
         printf("\nThe process doesn't converge.\n");
     }
+
+    printf("\n By Saroj Dhakal.");
     return 0;
 }
