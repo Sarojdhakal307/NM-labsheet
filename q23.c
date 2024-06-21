@@ -1,66 +1,67 @@
-//Gauss Seidel Iteration
+//Laplace's Equation
 #include <stdio.h>
 #include <math.h>
 
-#define Error 0.01
+#define MAX 10
+#define ERROR 0.01
 
 int main() {
-    int n, i, j, k;
-    float sum, error, maxError, a[10][10], b[10], new_x[10], old_x[10];
+    int n, i, j;
+    float sum, maxError, new_x[MAX+2][MAX+2], old_x[MAX+2][MAX+2];
+    float tl, tr, tu, tb;
 
-    printf("Enter the dimension of system of equations: ");
+    printf("Enter dimensions of the plate (n for nxn grid): ");
     scanf("%d", &n);
 
-    printf("Enter coefficients row-wise: \n");
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            scanf("%f", &a[i][j]);
+    printf("Enter temperatures at left, right, bottom, and upper part of the plate respectively: ");
+    scanf("%f %f %f %f", &tl, &tr, &tb, &tu);
+
+    // Initialize grid points with boundary conditions
+    for (i = 0; i <= n+1; i++) {
+        for (j = 0; j <= n+1; j++) {
+            if (i == 0) {
+                new_x[i][j] = tb; // bottom boundary
+            } else if (i == n+1) {
+                new_x[i][j] = tu; // top boundary
+            } else if (j == 0) {
+                new_x[i][j] = tl; // left boundary
+            } else if (j == n+1) {
+                new_x[i][j] = tr; // right boundary
+            } else {
+                new_x[i][j] = 0.0; // initial guess for internal points
+            }
+            old_x[i][j] = new_x[i][j];
         }
     }
 
-    printf("Enter B vector: \n");
-    for (i = 0; i < n; i++) {
-        scanf("%f", &b[i]);
-    }
-
-    for (i = 0; i < n; i++) {
-        new_x[i] = 0.0; // Initial guess
-    }
-
-    while (1) {
+    // Gauss-Seidel Iteration
+    do {
         maxError = 0.0;
-        for (i = 0; i < n; i++) {
-            sum = b[i];
-            for (j = 0; j < n; j++) {
-                if (i != j) {
-                    sum -= a[i][j] * new_x[j];
+        for (i = 1; i <= n; i++) {
+            for (j = 1; j <= n; j++) {
+                sum = 0.25 * (new_x[i+1][j] + new_x[i-1][j] + new_x[i][j+1] + new_x[i][j-1]);
+                float error = fabs(sum - new_x[i][j]);
+                if (error > maxError) {
+                    maxError = error;
                 }
-            }
-
-            if (fabs(a[i][i]) < 1e-6) {
-                printf("Division by zero detected. The matrix may be singular or poorly scaled.\n");
-                return -1;
-            }
-
-            old_x[i] = new_x[i];
-            new_x[i] = sum / a[i][i];
-            error = fabs((new_x[i] - old_x[i]) / new_x[i]);
-            if (error > maxError) {
-                maxError = error;
+                new_x[i][j] = sum;
             }
         }
 
-        if (maxError < Error) {
-            break;
+        // Update old_x for next iteration
+        for (i = 1; i <= n; i++) {
+            for (j = 1; j <= n; j++) {
+                old_x[i][j] = new_x[i][j];
+            }
         }
-    }
+    } while (maxError > ERROR);
 
-    printf("Solution: \n");
-    for (i = 0; i < n; i++) {
-        printf("x%d = %.2f\n", i + 1, new_x[i]);
-    }
-     printf("\nBy Saroj Dhakal.");
-
+    // Print the resulting four corner values
+    printf("Top-left corner: %.2f\n", new_x[1][1]);
+    printf("Top-right corner: %.2f\n", new_x[1][n]);
+    printf("Bottom-left corner: %.2f\n", new_x[n][1]);
+    printf("Bottom-right corner: %.2f\n", new_x[n][n]);
+      printf("\nBy Saroj Dhakal.");
 
     return 0;
 }

@@ -1,49 +1,78 @@
-/* Gauss Jordan Method */
+//Doo-Little LU decomposition  
 #include <stdio.h>
-#include <math.h>
-
-#define MAX 10
+#include <conio.h>
 
 int main() 
 {
-    int i, j, k, n;
-    float a[MAX][MAX], c;
+    int n, i, j, k;
+    float sum = 0;
+    float a[10][10], u[10][10], l[10][10];
 
-    printf("Enter the number of unknowns: ");
+    printf("Enter dimension of matrix: ");
     scanf("%d", &n);
 
-    printf("Enter %dx%d elements for the augmented matrix:\n", n, n + 1);
-    for (i = 1; i <= n; i++)
-        for (j = 1; j <= n + 1; j++)
-            scanf("%f", &a[i][j]);
-
-    /* Forward and backward Elimination process */
-    for (k = 1; k <= n; k++) 
+    printf("Enter the elements of matrix:\n");
+    for (i = 0; i < n; i++) 
     {
-        for (i = 1; i <= n; i++) 
+        for (j = 0; j < n; j++) 
         {
-            if (i != k) 
-            {
-                c = a[i][k] / a[k][k];
-                for (j = k; j <= n + 1; j++)
-                    a[i][j] = a[i][j] - c * a[k][j];
-            }
+            scanf("%f", &a[i][j]);
         }
     }
 
-    printf("\nThe reduced echelon form matrix is:\n");
-    for (i = 1; i <= n; i++) 
+    // Compute elements of L and U matrix
+    for (j = 0; j < n; j++) 
     {
-        a[i][n + 1] /= a[i][i];
-        a[i][i] /= a[i][i]; /* making diagonal element identity */
-        for (j = 1; j <= n + 1; j++)
-            printf("%.2f\t", a[i][j]);
+        u[0][j] = a[0][j];
+    }
+
+    for (i = 0; i < n; i++) 
+    {
+        l[i][i] = 1;
+        l[i][0] = a[i][0] / u[0][0];
+    }
+
+    for (j = 1; j < n; j++) 
+    {
+        for (i = 1; i <= j; i++) 
+        {
+            for (k = 0; k <= i; k++) 
+            {
+                sum += l[i][k] * u[k][j];
+            }
+            u[i][j] = a[i][j] - sum;
+            sum = 0;
+        }
+        for (i = j + 1; i < n; i++) 
+        {
+            for (k = 0; k <= j - 1; k++) 
+            {
+                sum += l[i][k] * u[k][j];
+            }
+            l[i][j] = (a[i][j] - sum) / u[j][j];
+            sum = 0;
+        }
+    }
+
+    printf("\n*****L matrix*****\n");
+    for (i = 0; i < n; i++) 
+    {
+        for (j = 0; j < n; j++) 
+        {
+            printf("%.2f\t", l[i][j]);
+        }
         printf("\n");
     }
 
-    printf("\nThe solution set is:\n");
-    for (i = 1; i <= n; i++)
-        printf("x[%d] = %.4f\n", i, a[i][n + 1]);
+    printf("\n*****U matrix*****\n");
+    for (i = 0; i < n; i++) 
+    {
+        for (j = 0; j < n; j++) 
+        {
+            printf("%.2f\t", u[i][j]);
+        }
+        printf("\n");
+    }
 
      printf("\nBy Saroj Dhakal.");
 

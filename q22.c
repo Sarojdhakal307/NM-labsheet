@@ -1,87 +1,66 @@
-//Jacobi Iteration
-#include<stdio.h>
-#include<math.h>
+//Gauss Seidel Iteration
+#include <stdio.h>
+#include <math.h>
 
-#define MAX 10
-#define E 0.01
-#define N 10
+#define Error 0.01
 
-int main() 
-{
-    int i, j, k, n;
-    float a[MAX][MAX], x[MAX], x0[MAX], residual[MAX], sum, max_residual;
+int main() {
+    int n, i, j, k;
+    float sum, error, maxError, a[10][10], b[10], new_x[10], old_x[10];
 
-    printf("Enter the number of unknowns: ");
+    printf("Enter the dimension of system of equations: ");
     scanf("%d", &n);
 
-    printf("Enter %dx%d elements for the augmented matrix:\n", n, n + 1);
-    for (i = 0; i < n; i++) 
-    {
-        for (j = 0; j < n + 1; j++) 
-        {
+    printf("Enter coefficients row-wise: \n");
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
             scanf("%f", &a[i][j]);
         }
     }
 
-    for (i = 0; i < n; i++) 
-    {
-        x0[i] = 0;  // Initialize initial guess vector with zeros
+    printf("Enter B vector: \n");
+    for (i = 0; i < n; i++) {
+        scanf("%f", &b[i]);
     }
 
-    for (k = 0; k < N; k++) 
-    {
-        for (i = 0; i < n; i++) 
-        {
-            sum = 0;
-            for (j = 0; j < n; j++) 
-            {
-                if (i != j) 
-                {
-                    sum += a[i][j] * x0[j];
+    for (i = 0; i < n; i++) {
+        new_x[i] = 0.0; // Initial guess
+    }
+
+    while (1) {
+        maxError = 0.0;
+        for (i = 0; i < n; i++) {
+            sum = b[i];
+            for (j = 0; j < n; j++) {
+                if (i != j) {
+                    sum -= a[i][j] * new_x[j];
                 }
             }
-            x[i] = (-sum + a[i][n]) / a[i][i]; // Jacobi iteration formula
-        }
 
-        // Calculate the residual vector
-        max_residual = 0;
-        for (i = 0; i < n; i++) 
-        {
-            residual[i] = fabs(x[i] - x0[i]);
-            if (residual[i] > max_residual) 
-            {
-                max_residual = residual[i];
+            if (fabs(a[i][i]) < 1e-6) {
+                printf("Division by zero detected. The matrix may be singular or poorly scaled.\n");
+                return -1;
+            }
+
+            old_x[i] = new_x[i];
+            new_x[i] = sum / a[i][i];
+            error = fabs((new_x[i] - old_x[i]) / new_x[i]);
+            if (error > maxError) {
+                maxError = error;
             }
         }
 
-        // Check for convergence
-        if (max_residual < E) 
-        {
+        if (maxError < Error) {
             break;
         }
-
-        // Update the initial guess for the next iteration
-        for (i = 0; i < n; i++) 
-        {
-            x0[i] = x[i];
-        }
     }
 
-    if (k == N) 
-    {
-        printf("Maximum number of iterations exceeded.\n");
-    } 
-    else 
-    {
-        printf("The solution set is:\n");
-        for (i = 0; i < n; i++) 
-        {
-            printf("x[%d]=%.3f\n", i + 1, x[i]);
-        }
+    printf("Solution: \n");
+    for (i = 0; i < n; i++) {
+        printf("x%d = %.2f\n", i + 1, new_x[i]);
     }
-
-    printf("\nThe number of iterations: %d\n", k + 1);
      printf("\nBy Saroj Dhakal.");
+
 
     return 0;
 }

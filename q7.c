@@ -1,4 +1,4 @@
-// 6.	Write a C program to interpolate using forward difference formula.
+// 7.	Write a C program to interpolate using forward difference formula.
 
 //Forward Difference
 #include<stdio.h> 

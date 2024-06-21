@@ -1,79 +1,86 @@
-//Doo-Little LU decomposition  
-#include <stdio.h>
-#include <conio.h>
+//Jacobi Iteration
+#include<stdio.h>
+#include<math.h>
+
+#define MAX 10
+#define E 0.01
+#define N 10
 
 int main() 
 {
-    int n, i, j, k;
-    float sum = 0;
-    float a[10][10], u[10][10], l[10][10];
+    int i, j, k, n;
+    float a[MAX][MAX], x[MAX], x0[MAX], residual[MAX], sum, max_residual;
 
-    printf("Enter dimension of matrix: ");
+    printf("Enter the number of unknowns: ");
     scanf("%d", &n);
 
-    printf("Enter the elements of matrix:\n");
+    printf("Enter %dx%d elements for the augmented matrix:\n", n, n + 1);
     for (i = 0; i < n; i++) 
     {
-        for (j = 0; j < n; j++) 
+        for (j = 0; j < n + 1; j++) 
         {
             scanf("%f", &a[i][j]);
         }
     }
 
-    // Compute elements of L and U matrix
-    for (j = 0; j < n; j++) 
-    {
-        u[0][j] = a[0][j];
-    }
-
     for (i = 0; i < n; i++) 
     {
-        l[i][i] = 1;
-        l[i][0] = a[i][0] / u[0][0];
+        x0[i] = 0;  // Initialize initial guess vector with zeros
     }
 
-    for (j = 1; j < n; j++) 
+    for (k = 0; k < N; k++) 
     {
-        for (i = 1; i <= j; i++) 
+        for (i = 0; i < n; i++) 
         {
-            for (k = 0; k <= i; k++) 
-            {
-                sum += l[i][k] * u[k][j];
-            }
-            u[i][j] = a[i][j] - sum;
             sum = 0;
-        }
-        for (i = j + 1; i < n; i++) 
-        {
-            for (k = 0; k <= j - 1; k++) 
+            for (j = 0; j < n; j++) 
             {
-                sum += l[i][k] * u[k][j];
+                if (i != j) 
+                {
+                    sum += a[i][j] * x0[j];
+                }
             }
-            l[i][j] = (a[i][j] - sum) / u[j][j];
-            sum = 0;
+            x[i] = (-sum + a[i][n]) / a[i][i]; // Jacobi iteration formula
         }
-    }
 
-    printf("\n*****L matrix*****\n");
-    for (i = 0; i < n; i++) 
-    {
-        for (j = 0; j < n; j++) 
+        // Calculate the residual vector
+        max_residual = 0;
+        for (i = 0; i < n; i++) 
         {
-            printf("%.2f\t", l[i][j]);
+            residual[i] = fabs(x[i] - x0[i]);
+            if (residual[i] > max_residual) 
+            {
+                max_residual = residual[i];
+            }
         }
-        printf("\n");
-    }
 
-    printf("\n*****U matrix*****\n");
-    for (i = 0; i < n; i++) 
-    {
-        for (j = 0; j < n; j++) 
+        // Check for convergence
+        if (max_residual < E) 
         {
-            printf("%.2f\t", u[i][j]);
+            break;
         }
-        printf("\n");
+
+        // Update the initial guess for the next iteration
+        for (i = 0; i < n; i++) 
+        {
+            x0[i] = x[i];
+        }
     }
 
+    if (k == N) 
+    {
+        printf("Maximum number of iterations exceeded.\n");
+    } 
+    else 
+    {
+        printf("The solution set is:\n");
+        for (i = 0; i < n; i++) 
+        {
+            printf("x[%d]=%.3f\n", i + 1, x[i]);
+        }
+    }
+
+    printf("\nThe number of iterations: %d\n", k + 1);
      printf("\nBy Saroj Dhakal.");
 
     return 0;
